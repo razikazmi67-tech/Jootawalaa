@@ -213,8 +213,8 @@ async function saveProduct(){
   }
 
   let result;
-  if(editingId) result=await sb.from("products").update({name,price:Number(price),sizes,photo_url:photoUrl}).eq("id",editingId);
-  else result=await sb.from("products").insert({name,price:Number(price),sizes,photo_url:photoUrl});
+  if(editingId) result=await sb.from("products").update({name,category,price:Number(price),sizes,photo_url:photoUrl}).eq("id",editingId);
+  else result=await sb.from("products").insert({name,category,price:Number(price),sizes,photo_url:photoUrl});
 
   if(result.error){alert("Save failed: "+result.error.message);return}
   closeModal("productModal"); await loadProducts();
