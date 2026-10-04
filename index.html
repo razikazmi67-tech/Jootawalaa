@@ -60,13 +60,7 @@ footer{background:#050505;color:#aaa;padding:28px 6%;margin-top:30px}
   <div class="toolbar">
     <h2>Our Shoes</h2>
     <input class="search" id="search" placeholder="Search shoes..." oninput="render()">
-    <select class="search" id="categoryFilter" onchange="render()">
-      <option value="">All Types</option>
-      <option>Sport Shoes</option><option>Sneakers</option><option>Leather Shoes</option>
-      <option>Boots</option><option>Casual Shoes</option><option>Formal Shoes</option>
-      <option>Running Shoes</option><option>Loafers</option><option>Sandals</option>
-      <option>Slippers</option><option>Other</option>
-    </select>
+
   </div>
   <div class="grid" id="products"></div>
 </main>
@@ -89,15 +83,6 @@ footer{background:#050505;color:#aaa;padding:28px 6%;margin-top:30px}
     <h2 id="formTitle">Add Shoe</h2>
     <input id="editId" type="hidden">
     <div class="field"><label>Shoe Name</label><input id="pName" placeholder="e.g. Air Runner"></div>
-    <div class="field"><label>Shoe Type</label>
-      <select id="pCategory" style="width:100%;padding:11px;border:1px solid #ccc;border-radius:8px">
-        <option value="">Select shoe type</option>
-        <option>Sport Shoes</option><option>Sneakers</option><option>Leather Shoes</option>
-        <option>Boots</option><option>Casual Shoes</option><option>Formal Shoes</option>
-        <option>Running Shoes</option><option>Loafers</option><option>Sandals</option>
-        <option>Slippers</option><option>Other</option>
-      </select>
-    </div>
     <div class="row">
       <div class="field"><label>Price (₹)</label><input id="pPrice" type="number" min="0"></div>
       <div class="field"><label>Sizes</label><input id="pSizes" placeholder="6, 7, 8, 9, 10"></div>
@@ -145,7 +130,6 @@ async function loadProducts(){
 
 function render(){
   const q=document.getElementById("search").value.toLowerCase();
-  const cat=document.getElementById("categoryFilter").value;
   const list=products.filter(p=>
     (p.name+" "+(p.sizes||"")+" "+(p.category||"")).toLowerCase().includes(q) &&
     (!cat || p.category===cat)
@@ -168,7 +152,7 @@ function render(){
 
 function orderWhatsApp(id){
   const p=products.find(x=>x.id===id); if(!p)return;
-  const msg=`Hello Jootawalaa, I want to order this shoe.\n\nShoe: ${p.name}\nPrice: ₹${p.price}\nSize: ${p.sizes||"Please confirm"}\n\nPlease confirm availability and order details.`;
+  const msg=`Hello Jootawalaa, I want to order this shoe.\n\nShoe: ${p.name}\nPrice: ₹${p.price}\nSize: ${p.sizes||"Please confirm"}\nShoe Image: ${p.photo_url || "Not available"}\n\nPlease confirm availability and order details.`;
   window.open("https://wa.me/916388911398?text="+encodeURIComponent(msg),"_blank");
 }
 
@@ -197,7 +181,6 @@ document.getElementById("pPhoto").addEventListener("change",e=>{
 async function saveProduct(){
   if(!isOwner())return;
   const name=document.getElementById("pName").value.trim();
-  const category=document.getElementById("pCategory").value;
   const price=document.getElementById("pPrice").value;
   const sizes=document.getElementById("pSizes").value.trim();
   const file=document.getElementById("pPhoto").files[0];
@@ -213,8 +196,8 @@ async function saveProduct(){
   }
 
   let result;
-  if(editingId) result=await sb.from("products").update({name,category,price:Number(price),sizes,photo_url:photoUrl}).eq("id",editingId);
-  else result=await sb.from("products").insert({name,category,price:Number(price),sizes,photo_url:photoUrl});
+  if(editingId) result=await sb.from("products").update({name,price:Number(price),sizes,photo_url:photoUrl}).eq("id",editingId);
+  else result=await sb.from("products").insert({name,price:Number(price),sizes,photo_url:photoUrl});
 
   if(result.error){alert("Save failed: "+result.error.message);return}
   closeModal("productModal"); await loadProducts();
